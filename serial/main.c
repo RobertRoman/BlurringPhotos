@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 
 #define COLOR 6
 #define GRAYSCALE 5
 
-float smoothMatrix[3][3] = {{1.f / 9.f, 1.f / 9.f, 1.f / 9.f}, 
-                            {1.f / 9.f, 1.f / 9.f, 1.f / 9.f}, 
-                            {1.f / 9.f, 1.f / 9.f, 1.f / 9.f}};
+float blurFilter[3][3] = {{1.f / 9.f, 1.f / 9.f, 1.f / 9.f}, 
+                          {1.f / 9.f, 1.f / 9.f, 1.f / 9.f}, 
+                          {1.f / 9.f, 1.f / 9.f, 1.f / 9.f}};
 
 // typedef enum filter {BLUR, SHARPEN, MEAN, EMBOSS, SMOOTH} filter;
 
@@ -129,9 +130,9 @@ void applyFilter (image *in, image *buff, float filter[3][3]) {
                             blue += in->color_image[x][y].blue * filter[x - (i - 1)][y - (j - 1)];
                         }
                     }
-                    output->color_image[i][j].red = (u_char) red;
-                    output->color_image[i][j].green = (u_char) green;
-                    output->color_image[i][j].blue = (u_char) blue;
+                    output->color_image[i][j].red = (uint8_t) red;
+                    output->color_image[i][j].green = (uint8_t) green;
+                    output->color_image[i][j].blue = (uint8_t) blue;
             
                 }
 
@@ -145,7 +146,7 @@ void applyFilter (image *in, image *buff, float filter[3][3]) {
                             gray += in->gray_image[x][y].gray * filter[x - (i - 1)][y - (j - 1)];
                         }
                     }
-                    output->gray_image[i][j].gray = (u_char) gray;
+                    output->gray_image[i][j].gray = (uint8_t) gray;
                 }
             }
         }
@@ -154,15 +155,12 @@ void applyFilter (image *in, image *buff, float filter[3][3]) {
     free(output);
 }
 
-void imageProcessing (image* input, image* output, float filter[3][3]) {
-    applyFilter(input, output, filter);  
-}
 
 int main (int argc, char **argv) {
     image input, output;
     readInput(argv[1], &input); 
 
-    applyFilter(&input, &output, blurMatrix);  
+    applyFilter(&input, &output, blurFilter);  
     input = output;
     
     writeData(argv[2], &output);
